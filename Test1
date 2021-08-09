@@ -1,0 +1,38 @@
+# Apex Class
+public class FetchAccountDetails {
+    @auraEnabled
+    public static list<account> FetchAccountDetailsMethod (string accid)
+    {
+        list<account> acclst= [select id, name, rating , type, phone from account];
+        return acclst;
+    }
+     @auraEnabled
+    public static List<Account> findByName(String searchKey) {
+        String name =  searchKey + '%';
+        return [SELECT id, name, phone,type,rating FROM Account WHERE name LIKE :name];
+}
+}
+===============================
+# Test Class
+@istest
+public class TestFetchAccountDetails {
+  @testsetup
+    static void TestFetchAccountDetails(){
+       list<account> acclst= new list<account>(); 
+        for(integer i=0;i<=25;i++){
+        account acc= new account(name='testApex'+i);
+        acclst.add(acc);
+        }
+    insert acclst;
+    }
+    
+    @istest
+    static void testFetchAccountDetailsMethod()
+    {
+        account acc1= [select id ,name from account where name='testApex3'];
+        List<Account> accList = FetchAccountDetails.FetchAccountDetailsMethod(acc1.id);
+        List<Account> accNameList = FetchAccountDetails.findByName(acc1.name);
+        System.assertEquals('testApex3',accList[3].name);
+        
+    }
+}
